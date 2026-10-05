@@ -1,4 +1,5 @@
 const mongoose = require('mongoose')
+const User = require('./user.models')
 
 const ProjectSchema = new mongoose.Schema(
     {
@@ -20,16 +21,25 @@ const ProjectSchema = new mongoose.Schema(
             type: Date,
             required: true
         },
-        projectManagerId: {
+        projectManager: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "User",
-            required: true
+            required: true,
+            validate: {
+                validator: async function (v) {
+                const user = await User.findById(v)
+                return !!user && ["admin" , "project manager"].includes(user.role)
+            },
+                message: (props) => `User role must be 'admin' or 'project manager'`
+            }
+
         },
-        teamMembers: {
-            type: String,
-            enum:["software engineer" , "product designer" , "product manager" , "HRBP"],
-            default: "software engineer"
-        }
+        teamMembers: [
+            {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: 'User'
+            }
+        ]
     }
 )
 

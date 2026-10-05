@@ -1,37 +1,50 @@
-const fastify = require('fastify')( {
-    logger : true
+// import fastify package
+const fastify = require('fastify')({
+  logger: {
+    transport: { target: 'pino-pretty' }
+  }
 })
 
+// add my hooks
+
+// 1. onRequest Hook 
+fastify.addHook(
+    "onRequest" , async(request , reply) => {
+        console.log("--- " * 10)
+        console.log(request , request.method , request.url , request.host , request.remoteAddress , request.remotePort)
+        console.log("--- " * 10)
+    }
+)
+
+// importing mongoose ODM(Object Document Mapping)
 const mongoose = require('mongoose')
 
-const PORT = 3000
+// declaring backend service port
+const PORT = process.env.PORT
 
-
-
-// import my routes
+// import  routes
 const userRoutes = require('./src/routes/user.routes.js')
 const projectRoutes = require('./src/routes/project.routes.js')
+const taskRoutes = require('./src/routes/task.routes.js')
 
-// connect to my db
-try {
-    mongoose.connect(
-        process.env.MONGODB_URI 
-    )
-} catch (err) {
-    fastify.log.err("--- --- --- ---data base connection has gone wrong!!!!1--- --- --- ---")
-}
-
-
-//start my server
+// registering routes
 fastify.register(userRoutes , { prefix : '/api/v1/users'})
 fastify.register(projectRoutes , { prefix: '/api/v1/projects'})
+fastify.register(taskRoutes , { prefix: '/api/v1/tasks'})
 
+// start the server
 const start = async () => {
      try { 
-        await fastify.listen( { port : PORT } )
-        fastify.log.info(`server is running on port : ${PORT}`)
-     } catch(error) {
-        fastify.log.error(error)
+        await mongoose.connect(
+            process.env.MONGODB_URI
+        )
+        await fastify.listen(
+            {
+                port: PORT || 4000
+            }
+        )
+     } catch(err) {
+        fastify.log.error(err)
         process.exit(1)
      }
 }
