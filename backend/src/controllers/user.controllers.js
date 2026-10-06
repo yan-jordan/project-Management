@@ -33,7 +33,10 @@ async function updateUser(request , reply) {
         const user = await User.findByIdAndUpdate( request.params.id , request.body , {
             new : true
         })
-        reply.status(200).send(user)
+        reply.status(200).send({
+            user: user, 
+            image: ""
+        })
     } catch(err) {
         reply.status(500).send("sth went wrong.\nerror is :" , err)
     }

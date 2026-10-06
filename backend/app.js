@@ -7,14 +7,12 @@ const fastify = require('fastify')({
 
 // add my hooks
 
-// 1. onRequest Hook 
-fastify.addHook(
-    "onRequest" , async(request , reply) => {
-        console.log("--- " * 10)
-        console.log(request , request.method , request.url , request.host , request.remoteAddress , request.remotePort)
-        console.log("--- " * 10)
-    }
-)
+// 1. onHandler Hook 
+//const auth = require("./src/middlewares/auth.js")
+//fastify.addHook(
+//    "preHandler" , auth
+//)
+
 
 // importing mongoose ODM(Object Document Mapping)
 const mongoose = require('mongoose')
