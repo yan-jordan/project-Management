@@ -1,4 +1,4 @@
-async function auth(request , reply){
+async function apiKeyAuth(request , reply){
     const request_api_key = request.headers["api-key"]
     const server_api_key = process.env.APIKEY
 
@@ -7,4 +7,4 @@ async function auth(request , reply){
     }
 }
 
-module.exports = auth
+module.exports = apiKeyAuth

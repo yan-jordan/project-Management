@@ -34,7 +34,7 @@ const UserSchema = new mongoose.Schema(
 )
 
 UserSchema.pre(
-    "save" , async function(next){
+    "save" , async function(){
             if (this.isNew || this.isModified('password')){
                 const salt = await bcrypt.genSalt(10)
                 const hash = await bcrypt.hash(this.password , salt)
@@ -42,6 +42,15 @@ UserSchema.pre(
             }
         }
 )
+
+UserSchema.methods.compare = async function(password){
+    const isValid = await bcrypt.compare(password , this.password)
+    if(isValid){
+        return true
+    }else{
+        return false
+    }
+}
 
 const User = mongoose.model("User" , UserSchema)
 module.exports = User

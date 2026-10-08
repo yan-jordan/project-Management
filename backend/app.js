@@ -5,14 +5,14 @@ const fastify = require('fastify')({
   }
 })
 
-// add my hooks
+// import and register my fastify plugins
+const jwtPlugin = require('./src/plugins/jwtPlugin.js')
+fastify.register(jwtPlugin)
 
-// 1. onHandler Hook 
-//const auth = require("./src/middlewares/auth.js")
-//fastify.addHook(
-//    "preHandler" , auth
-//)
+// import other stuffs
+const basicAuth = require('./src/middlewares/auth/different-types-authentication/basic.auth.js')
 
+// add my hooks 
 
 // importing mongoose ODM(Object Document Mapping)
 const mongoose = require('mongoose')

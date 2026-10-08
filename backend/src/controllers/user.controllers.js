@@ -19,10 +19,21 @@ async function getUserById(request , reply) {
 }
 
 async function createUser(request , reply) {
+    const { firstName , lastName , email , password , role } = request.body
     try{
-        const user = new User(request.body)
-        const result = user.save()
-        reply.send(result)
+        const isUserAlreadyExist = await User.findOne({
+            email: email
+        })
+        if (isUserAlreadyExist){
+            return reply.status(409).type("text/html").send('<img width=400 height=400 src="https://http.cat/409" /> <h1>The email  already has saved!</h1>')
+        }
+        else{
+        const user = new User({ firstName , lastName , email , password , role })
+        const result = await user.save()
+        const savedUser = result.toObject()
+        delete savedUser.password
+        reply.status(201).send(savedUser)
+        }
     } catch(err) {
         reply.status(500).send( { err: err.message } )
     }
@@ -30,11 +41,17 @@ async function createUser(request , reply) {
 
 async function updateUser(request , reply) {
     try{
-        const user = await User.findByIdAndUpdate( request.params.id , request.body , {
-            new : true
-        })
+        const user = await User.findById(request.params.id)
+        if (!user) return reply.status(404).send({ error: 'User not found' })
+        const { firstName, lastName, email, password, role } = request.body
+        for (const [field, value] of Object.entries({ firstName, lastName, email, password, role })) {
+            if (value !== undefined) user[field] = value
+        }
+        await user.save()
+        const savedUser = user.toObject()
+        delete savedUser.password
         reply.status(200).send({
-            user: user, 
+            user: savedUser, 
             image: ""
         })
     } catch(err) {
@@ -58,4 +75,3 @@ module.exports = {
     updateUser,
     deleteUser
 }
-
