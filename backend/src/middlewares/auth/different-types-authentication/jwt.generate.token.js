@@ -13,12 +13,13 @@ async function generateJWT(request , reply ){
     if(!(await matchDB(user , password))){
         return reply.status(403).send("The password is incorrect.")
     }
-    const { firstName , lastName } = user
+    const { firstName , lastName , role } = user
     const token = request.server.jwt.sign({
         payload: {
             firstName: firstName ,
             lastName: lastName, 
-            email: email
+            email: email,
+            role: role
         }
     }, {
         expiresIn: '1h'
